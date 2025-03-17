@@ -81,26 +81,41 @@ async fn net_task(stack: &'static Stack<cyw43::NetDriver<'static>>) -> ! {
 
 fn increment_time(second: &mut i32, minute: &mut i32, hour: &mut i32, day: &mut u32, month: &mut u32, year: &mut u32) {
     *second += 1;
-    if *second >= 60 {
-        *second = 0;
-        *minute += 1;
-        if *minute >= 60 {
-            *minute = 0;
-            *hour += 1;
-            if *hour >= 24 {
-                *hour = 0;
-                *day += 1;
-                if *day > 30 {
-                    *day = 1;
-                    *month += 1;
-                    if *month > 12 {
-                        *month = 1;
-                        *year += 1;
-                    }
-                }
+    if *second < 60 { return; }
+    
+    *second = 0;
+    *minute += 1;
+    if *minute < 60 { return; }
+    
+    *minute = 0;
+    *hour += 1;
+    if *hour < 24 { return; }
+    
+    *hour = 0;
+    *day += 1;
+
+    let days_in_month = match *month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 => {
+            // Leap year calculation
+            if (*year % 400 == 0) || (*year % 4 == 0 && *year % 100 != 0) {
+                29
+            } else {
+                28
             }
-        }
-    }
+        },
+        _ => unreachable!("Month must be between 1 and 12"),
+    };
+    
+    if *day <= days_in_month { return; }
+    
+    *day = 1;
+    *month += 1;
+    if *month <= 12 { return; }
+    
+    *month = 1;
+    *year += 1;
 }
 
 //============================================================================//

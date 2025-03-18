@@ -95,17 +95,15 @@ fn increment_time(second: &mut i32, minute: &mut i32, hour: &mut i32, day: &mut 
     *day += 1;
 
     let days_in_month = match *month {
-        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
-        4 | 6 | 9 | 11 => 30,
         2 => {
-            // Leap year calculation
             if (*year % 400 == 0) || (*year % 4 == 0 && *year % 100 != 0) {
                 29
             } else {
                 28
             }
         },
-        _ => unreachable!("Month must be between 1 and 12"),
+        4 | 6 | 9 | 11 => 30,
+        _ => 31,
     };
     
     if *day <= days_in_month { return; }
